@@ -1,0 +1,5 @@
+1. create two brokers
+
+2. Create following topics: 
+	./bin/kafka-topics.sh --create --zookeeper localhost:2181 --partition-tolerance 1 --replication-factor 1 --topic response_topic
+	./bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 2 --replication-factor 2 --topic hotel_topic

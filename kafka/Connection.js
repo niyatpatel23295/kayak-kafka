@@ -9,11 +9,11 @@ function ConnectionProvider() {
             this.client.on('ready', function () { console.log('client ready!') })
         }
         return this.kafkaConsumerConnection;
+
     };
 
     //Code will be executed when we start Producer
     this.getProducer = function() {
-
         if (!this.kafkaProducerConnection) {
             this.client = new kafka.Client("localhost:2181");
             var HighLevelProducer = kafka.HighLevelProducer;
