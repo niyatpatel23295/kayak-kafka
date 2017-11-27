@@ -1,5 +1,4 @@
 var mongo = require("./mongo");
-var mongoURL = "mongodb://localhost:27017/kayak";
 const crypto = require('crypto');
 
 function handle_login_request(msg, callback){
@@ -7,7 +6,7 @@ function handle_login_request(msg, callback){
         if(err) {}
         else{
             try {
-                mongo.connect(mongoURL, function(){
+                mongo.connect(function(){
 
                     var coll = mongo.collection('creds');
 

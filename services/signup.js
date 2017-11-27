@@ -20,7 +20,7 @@ function handle_signup_request(msg, callback){
 
             try {
                 console.log('Mark 1 - before mondo data insert');
-                mongo.connect('mongodb://localhost:27017/demo3', function(){
+                mongo.connect(function(){
                     var collection = mongo.collection('creds')
                     collection.insertOne({
                         firstname: msg.firstname,
