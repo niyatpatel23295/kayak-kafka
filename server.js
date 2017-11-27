@@ -75,6 +75,7 @@ consumer_hotel.on('message', function (message) {
     }
     else if(message.key == 'search_hotels'){
         var data = JSON.parse(message.value);
+
         try {
             hotels.handle_search_hotels_request(data.data, function(err, res){
                 if(err){
