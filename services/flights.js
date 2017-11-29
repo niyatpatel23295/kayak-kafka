@@ -89,32 +89,19 @@ var _ = require('lodash');
  * }
  *
  */
-function handle_search_hotels_request(msg, callback) {
+function handle_search_flights_request(msg, callback) {
     try {
 
         var filter = msg.filter;
-        console.log("message JSON", filter.hotel_stars);
         var Search_SQL = "";
 
-        // formulate Search SQL
-        var basic_SQL =                                         "SELECT * " +
-                                                                "FROM hotels " +
-                                                                "INNER JOIN rooms ON rooms.hid = hotels.hid " +
-                                                                "WHERE hotels.cid =  " + filter.city_id  ;
 
-        var hotel_stars_filter =  filter.hotel_stars        ?   " AND hotels.hotel_stars = " +filter.hotel_stars                        : "";
-        var room_price_filter = filter.hotel_price          ?   " AND rooms.price BETWEEN " +filter.hotel_price[0] + " AND " +filter.hotel_price[1] : "";
-        var hotel_ratings_filter =  filter.hotel_ratings    ?   " AND hotels.hotel_ratings >= " +filter.hotel_ratings                   : "";
-        var no_rooms_filter = filter.no_rooms               ?   "  AND rid IN" +
-                                                                "    (SELECT rid" +
-                                                                "     FROM rooms" +
-                                                                "     INNER JOIN" +
-                                                                "       (SELECT count(rid) AS no_rooms" +
-                                                                "        FROM rooms" +
-                                                                "        HAVING count(rid) >= " +filter.no_rooms + ") AS rooms2)"          : "";
+        var basic_SQL       = "select * from flights where to_airport = " +filter.to_airport + " and from_airport= " +filter.from_airport +" " +
+                                                " and DATE(departure) between date_sub(str_to_date('" +filter.departure_date +"','%Y-%m-%d'), interval " +filter.flex_days +" day) and date_add(str_to_date('" +filter.departure_date +"','%Y-%m-%d'), interval " +filter.flex_days +" day) " ;
+        var class_filter    =  filter.flight_class ? " and class = '" +filter.flight_class +"' " : "" ;
+        var order_by_filter = filter.order_by ? " order by " +filter.order_by[0]+ " " +filter.order_by[1] : " order by price asc" ;
 
-        Search_SQL = basic_SQL + hotel_stars_filter + room_price_filter + hotel_ratings_filter + no_rooms_filter;
-
+        var Search_SQL = basic_SQL + class_filter + order_by_filter;
 
         mysql.executequery(Search_SQL, function (err, result) {
             if(err){
@@ -123,7 +110,7 @@ function handle_search_hotels_request(msg, callback) {
                 callback(err, {})
             }
             else{
-                callback(null, result);
+                callback(null, response);
             }
         })
     }
@@ -133,4 +120,4 @@ function handle_search_hotels_request(msg, callback) {
     }
 }
 
-module.exports = {handle_search_hotels_request};
+module.exports = {handle_search_flights_request};
