@@ -93,7 +93,7 @@ function handle_search_hotels_request(msg, callback) {
     try {
 
         var filter = msg.filter;
-        console.log("message JSON", filter.hotel_stars);
+        
         var Search_SQL = "";
 
         // formulate Search SQL

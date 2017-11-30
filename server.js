@@ -3,13 +3,12 @@ var login = require('./services/login');
 var hotels = require('./services/hotels');
 var flights = require('./services/flights');
 
-var consumer_hotel = connection.getConsumer('hotel_topic');
-var consumer_flight = connection.getConsumer('flight_topic');
+var consumer = connection.getConsumer();
 
 var producer = connection.getProducer();
 
 
-consumer_hotel.on('message', function (message) {
+consumer.on('message', function (message) {
 
 
     if(message.key == 'login_api'){
@@ -115,11 +114,7 @@ consumer_hotel.on('message', function (message) {
         }
 
     }
-});
-
-consumer_flight.on('message', function (message) {
-
-    if(message.key == 'search_flights'){
+    else if(message.key == 'search_flights'){
         var data = JSON.parse(message.value);
 
         try {
@@ -160,5 +155,4 @@ consumer_flight.on('message', function (message) {
         }
 
     }
-})
-
+});
