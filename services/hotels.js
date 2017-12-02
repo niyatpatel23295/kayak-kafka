@@ -159,6 +159,13 @@ function handle_add_hotel_request(msg, callback) {
     try {
 
         var Search_SQL = "SELECT cid FROM city WHERE city_name ='"+msg.city+"'";
+        var numOfDeluxRooms = msg.deluxNo;
+        var descOfDeluxRooms = msg.deluxDescription;
+        var numOfPremiumRooms = msg.premiumNo;
+        var descOfPremiumRooms = msg.premiumDescription;
+        var numOfStandardRooms = msg.standardNo;
+        var descOfStandardRooms = msg.standardDescription;
+
         mysql.executequery(Search_SQL, function (err, result) {
             if(err){
                 console.log(err);
@@ -180,10 +187,72 @@ function handle_add_hotel_request(msg, callback) {
                             callback(err, {})
                         }
                         else{
-                            console.log("City added to the DB!");
+
                             callback(null, result);
                         }
                     })
+
+                    var hId ='';
+                    getHidSQL = "Select hid from hotels where hotel_name='"+msg.hotel_name+"';";
+                    mysql.executequery(getHidSQL, function(err,result){
+                        if(err){
+                            console.log(err);
+                            callback(err, {})
+                        }else{
+                            hId = result[0].hid;
+                            console.log("hId"+hId);
+
+                            console.log("hId"+hId);
+
+                            console.log(numOfDeluxRooms+"  "+descOfDeluxRooms);
+
+                            //for delux rooms
+                            for(var i = 1; i<=numOfDeluxRooms;i++){
+                                var insertRoomQuery = "Insert into rooms (hid, price, room_number, room_description,room_type) values ("+hId+",500,"+100+i+",'"+descOfDeluxRooms+"','Delux')";
+                                console.log(insertRoomQuery);
+                                mysql.executequery(insertRoomQuery,function(err, result){
+                                    if(err){
+                                        console.log(err);
+                                        callback(err, {})
+                                    }else{
+                                        console.log("Room "+i+" in delux rooms for hotel "+msg.hotel_name+" inserted");
+                                    }
+                                })
+                            }
+
+                            for(var i = 1; i<=numOfPremiumRooms;i++){
+                                var insertRoomQuery = "Insert into rooms (hid, price, room_number, room_description,room_type) values ("+hId+",1000,"+200+i+",'"+descOfPremiumRooms+"','Premium')";
+                                console.log(insertRoomQuery);
+                                mysql.executequery(insertRoomQuery,function(err, result){
+                                    if(err){
+                                        console.log(err);
+                                        callback(err, {})
+                                    }else{
+                                        console.log("Room "+i+" in premium rooms for hotel "+msg.hotel_name+" inserted");
+                                    }
+                                })
+                            }
+
+                            for(var i = 1; i<=numOfStandardRooms;i++){
+                                var insertRoomQuery = "Insert into rooms (hid, price, room_number, room_description,room_type) values ("+hId+",500,"+100+i+",'"+descOfStandardRooms+"','Standard')";
+                                console.log(insertRoomQuery);
+                                mysql.executequery(insertRoomQuery,function(err, result){
+                                    if(err){
+                                        console.log(err);
+                                        callback(err, {})
+                                    }else{
+                                        console.log("Room "+i+" in standard rooms for hotel "+msg.hotel_name+" inserted");
+                                    }
+                                })
+                            }
+
+                        
+                        }
+                    })
+                    console.log("City added to the DB!");
+
+                    //Room Adding Logic goes here...
+
                 }
                 else
                 {
