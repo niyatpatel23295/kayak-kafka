@@ -1,6 +1,7 @@
 var mysql = require("./mysql");
 var fs = require('fs-extra');
 var _ = require('lodash');
+
 /**
  *
  * @param filter:{
@@ -97,23 +98,23 @@ function handle_search_hotels_request(msg, callback) {
         var Search_SQL = "";
 
         // formulate Search SQL
-        var basic_SQL =                                         "SELECT * " +
-                                                                "FROM hotels " +
-                                                                "INNER JOIN rooms ON rooms.hid = hotels.hid " +
-                                                                "WHERE hotels.cid =  " + filter.city_id  ;
+        var basic_SQL =                                         "SELECT h.hid as hid, h.hotel_name as hotel_name, h.hotel_address as hotel_address, h.zip_code as zip_code, h.hotel_stars as hotel_stars, h.hotel_ratings as hotel_ratings, h.description as hotel_description, h.cid as cid, h.hotel_image as hotel_image " +
+                                                                "FROM hotels h " +
+                                                                "INNER JOIN rooms ON rooms.hid = h.hid " +
+                                                                "WHERE h.cid in  (select cid from city where city.citY_name like '" +filter.city_name +"') "   ;
 
-        var hotel_stars_filter =  filter.hotel_stars        ?   " AND hotels.hotel_stars = " +filter.hotel_stars                        : "";
+        var hotel_stars_filter =  filter.hotel_stars        ?   " AND h.hotel_stars = " +filter.hotel_stars                        : "";
         var room_price_filter = filter.hotel_price          ?   " AND rooms.price BETWEEN " +filter.hotel_price[0] + " AND " +filter.hotel_price[1] : "";
-        var hotel_ratings_filter =  filter.hotel_ratings    ?   " AND hotels.hotel_ratings >= " +filter.hotel_ratings                   : "";
+        var hotel_ratings_filter =  filter.hotel_ratings    ?   " AND h.hotel_ratings >= " +filter.hotel_ratings                   : "";
         var no_rooms_filter = filter.no_rooms               ?   "  AND rid IN" +
                                                                 "    (SELECT rid" +
                                                                 "     FROM rooms" +
                                                                 "     INNER JOIN" +
                                                                 "       (SELECT count(rid) AS no_rooms" +
                                                                 "        FROM rooms" +
-                                                                "        HAVING count(rid) >= " +filter.no_rooms + ") AS rooms2)"          : "";
+                                                                "        HAVING count(rid) >= " +filter.no_rooms + ") AS rooms2) "          : "";
 
-        Search_SQL = basic_SQL + hotel_stars_filter + room_price_filter + hotel_ratings_filter + no_rooms_filter;
+        Search_SQL = basic_SQL + hotel_stars_filter + room_price_filter + hotel_ratings_filter + no_rooms_filter + " group by h.hid";
 
 
         mysql.executequery(Search_SQL, function (err, result) {
@@ -123,7 +124,27 @@ function handle_search_hotels_request(msg, callback) {
                 callback(err, {})
             }
             else{
-                callback(null, result);
+                var promise_arr = [];
+                result.forEach(function(hotel, index){
+                    hotel.hid;
+                    var roomSQL = "select price, room_number , room_description, room_type ,room_image from rooms where hid = " + hotel.hid;
+                    promise_arr.push(new Promise(function(resolve, reject){
+                        mysql.executequery(roomSQL, function(err, rooms){
+                            console.log(rooms)                          
+                            result[index].rooms = rooms;
+                            resolve();
+                        });
+
+                    }));
+
+
+                  
+                })
+                
+                Promise.all(promise_arr).then(function(){
+                    callback(null, result)
+                });
+
             }
         })
     }
@@ -132,5 +153,6 @@ function handle_search_hotels_request(msg, callback) {
         callback(e, {});
     }
 }
+
 
 module.exports = {handle_search_hotels_request};
