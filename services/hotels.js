@@ -155,4 +155,123 @@ function handle_search_hotels_request(msg, callback) {
 }
 
 
-module.exports = {handle_search_hotels_request};
+function handle_add_hotel_request(msg, callback) {
+    try {
+
+        var Search_SQL = "SELECT cid FROM city WHERE city_name ='"+msg.city+"'";
+        mysql.executequery(Search_SQL, function (err, result) {
+            if(err){
+                console.log(err);
+                callback(err, {})
+            }
+            else{
+                //callback(null, result);
+                // formulate inser SQL
+                console.log("CITY name: "+result[0].cid);
+                if(result[0].cid)
+                {
+                    var insert_SQL =  "INSERT INTO hotels" +
+                        "(hotel_name, hotel_address, zip_code, hotel_stars, hotel_ratings, description, cid, hotel_image )" +
+                        "values" +
+                        "('"+msg.hotel_name+"','"+msg.hotel_address+"','"+msg.zip_code+"','"+msg.hotel_stars+"','"+msg.hotel_ratings+"','"+msg.description+"','"+result[0].cid+"','"+msg.hotel_image+"')" ;
+                    mysql.executequery(insert_SQL, function (err, result) {
+                        if(err){
+                            console.log(err);
+                            callback(err, {})
+                        }
+                        else{
+                            console.log("City added to the DB!");
+                            callback(null, result);
+                        }
+                    })
+                }
+                else
+                {
+                    console.log("City not found!");
+                    callback("City not found!", {})
+                }
+
+            }
+        })
+    }
+    catch (e) {
+        console.log(e);
+        callback(e, {});
+    }
+}
+
+
+function handle_update_hotel_request(msg, callback) {
+    try {
+
+        var Search_city = "SELECT cid FROM city WHERE city_name ='"+msg.city+"'";
+        mysql.executequery(Search_city, function (err, result) {
+            if(err){
+                console.log(err);
+                callback(err, {})
+            }
+            else{
+
+                console.log("CITY name: "+result[0].cid);
+                if(result[0].cid)
+                {
+                    var Search_hotel = "SELECT hid FROM hotels WHERE cid ='"+result[0].cid+"' AND hotel_name ='" +msg.hotel_name+ "'";
+                    mysql.executequery(Search_hotel, function (err, resultH) {
+                        if (err) {
+                            console.log(err);
+                            callback(err, {})
+                        }
+                        else {
+                            //callback(null, result);
+                            // formulate inser SQL
+                            console.log("CITY name: " + resultH[0].hid);
+                            if (resultH[0].hid) {
+
+                                var upadte_SQL =  "UPDATE hotels SET " +
+                                    "hotel_name = '"+msg.hotel_name+ "', "+
+                                    "hotel_address = '"+msg.hotel_address+ "', "+
+                                    "zip_code = '"+msg.zip_code+ "', "+
+                                    "hotel_stars = '"+msg.hotel_stars+ "', "+
+                                    "hotel_ratings = '"+msg.hotel_ratings+ "', "+
+                                    "description = '"+msg.description+ "', "+
+                                    "hotel_image = '"+msg.hotel_image+ "' "+
+                                    "WHERE hid= "+resultH[0].hid+ ";";
+
+                                mysql.executequery(upadte_SQL, function (err, result) {
+                                    if(err){
+                                        console.log(err);
+                                        callback(err, {})
+                                    }
+                                    else{
+                                        console.log("Hotel updated to the DB!");
+                                        callback(null, result);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                console.log("Hotel not found!");
+                                callback("Hotel not found!", {})
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    console.log("City not found!");
+                    callback("City not found!", {})
+                }
+
+            }
+        })
+    }
+    catch (e) {
+        console.log(e);
+        callback(e, {});
+    }
+}
+
+
+exports.handle_search_hotels_request = handle_search_hotels_request;
+exports.handle_add_hotel_request = handle_add_hotel_request;
+exports.handle_update_hotel_request = handle_update_hotel_request;

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "crypto": "^1.0.1",
     "fs": "0.0.1-security",
     "fs-extra": "^4.0.2",
