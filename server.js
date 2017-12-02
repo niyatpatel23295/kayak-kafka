@@ -2,6 +2,7 @@ var connection =  new require('./kafka/Connection');
 var login = require('./services/login');
 var hotels = require('./services/hotels');
 var flights = require('./services/flights');
+var cars = require('./services/cars');
 
 var consumer = connection.getConsumer();
 var producer = connection.getProducer();
@@ -224,6 +225,48 @@ consumer.on('message', function (message) {
                         }
                     ];
                     console.log(payloads);
+                    producer.send(payloads, function(err, data){});
+                    return;
+                }
+
+            });
+        }
+        catch(e){
+            console.log(e);
+        }
+
+    }
+
+    else if(message.key == 'search_cars'){
+        var data = JSON.parse(message.value);
+
+        try {
+            cars.handle_search_cars_request(data.data, function(err, res){
+                if(err){
+                    var payloads = [
+                        { topic: data.replyTo,
+                            messages:JSON.stringify({
+                                correlationId:data.correlationId,
+                                data : {error: err}
+                            }),
+                            partition : 0
+                        }
+                    ];
+
+                    producer.send(payloads, function(err, res){});
+                    return;
+                }
+                else{
+                    var payloads = [
+                        { topic: data.replyTo,
+                            messages:JSON.stringify({
+                                correlationId:data.correlationId,
+                                data : res
+                            }),
+                            partition : 0
+                        }
+                    ];
+
                     producer.send(payloads, function(err, data){});
                     return;
                 }
