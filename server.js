@@ -12,7 +12,7 @@ consumer.on('message', function (message) {
 
 
     if(message.key == 'login_api'){
-        login.handle_login_request(data.data, function(err,res){
+        /*login.handle_login_request(data.data, function(err,res){
             try{
                 if(err){
                     console.log(err);
@@ -42,7 +42,7 @@ consumer.on('message', function (message) {
                 console.log(e)
             }
 
-        });
+        });*/
     }
     else if(message.key == 'signup_api'){
 
