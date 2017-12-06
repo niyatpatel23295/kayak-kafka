@@ -47,7 +47,7 @@ consumer.on('message', function (message) {
     else if(message.key == 'signup_api'){
 
         var data = JSON.parse(message.value);
-        signup.handle_signup_request(data.data, function(err, res){
+       /* signup.handle_signup_request(data.data, function(err, res){
             if(err){
                 var payloads = [
                     { topic: data.replyTo,
@@ -77,7 +77,7 @@ consumer.on('message', function (message) {
                 return;
             }
 
-        });
+        });*/
     }
     else if(message.key == 'search_hotels'){
         var data = JSON.parse(message.value);
