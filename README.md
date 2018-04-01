@@ -35,7 +35,7 @@ The object management strategy for this application is straight-forward approach
   **MySQL** can provide very good performance with structured data with proper use of **Indexing**. We used MySQL for storing   information about **Users**, **Flights**, **Hotels** and **Cars**. 
   
   Here is schema diagram of **core tables** used in the system.
-  ![Kayak_DB](kayak-frontend/readme-src/Kayak_DB.png)
+  ![Kayak_DB](readme-src/Kayak_DB.png)
   
  ##### MongoDB:
  **MongoDB** is very good in dealing with unstructured nature of data. We used MongoDB to store user transaction data which     can have high possiblity of requirement-change. It will not require refactoring code to accomodate the requirement change or   new feature request
